@@ -6,6 +6,8 @@ on:
 jobs:
   model-build:
     runs-on: ubuntu-latest
+    outputs:
+      model-hyperparameters: ${{ steps.publish-output.outputs.model-hyperparameters }}
     steps:
       - name: Get Code
         uses: actions/checkout@v4
@@ -25,6 +27,14 @@ jobs:
         run: python src/2-prepare-dataset-test.py
       - name: Train Evaluate Model
         run: python src/3-train-evaluate-models.py
+      - name : Install Dependency Bash Tools
+        run: sudo apt-get install csvtool
+      - name: Publish Output Model Hyperparameters
+        id: publish-output
+        run: |          
+          temp_var=$(csvtool format '%(1)\n' outputs/train/metrics/train_cv_model_results_best_model.csv | csvtool -u TAB drop 1 - )
+          echo $temp_var
+          echo "model-hyperparameters=$temp_var" >> $GITHUB_OUTPUT
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
@@ -48,5 +58,7 @@ jobs:
           ls
           ls preprocess
           ls train
+      - name: Output Model Hyperparameters
+        run: echo "${{ needs.model-build.outputs.model-hyperparameters }}"
       - name: Deploy Model
         run: echo "Deploy Model to AWS"

@@ -39,5 +39,11 @@ jobs:
     needs: model-build
     runs-on: ubuntu-latest
     steps:
+      - name: Download Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: best-model-files
+      - name: Output Artifact Contents
+        run: ls
       - name: Deploy Model
         run: echo "Deploy Model to AWS"

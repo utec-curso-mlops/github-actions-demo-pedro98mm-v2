@@ -1,6 +1,6 @@
 name: My Env Vars Workflow
 on:
-  push:
+  workflow_dispatch:
     branches:
       - 'master'
 env:
